@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dinner Standoff</title>
+    <style>
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            background-color: #f9fafb;
+            color: #1f2937;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .container {
+            background: white;
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 400px;
+            text-align: center;
+        }
+        h1 { margin-top: 0; font-size: 1.5rem; color: #ff4757; }
+        p { color: #4b5563; margin-bottom: 1.5rem; }
+        input {
+            width: 90%;
+            padding: 12px;
+            margin: 8px 0;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            font-size: 1rem;
+        }
+        button {
+            background-color: #ff4757;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 1rem;
+            transition: background-color 0.2s;
+        }
+        button:hover { background-color: #ff6b81; }
+        .hidden { display: none; }
+        .match-result { font-size: 1.5rem; font-weight: bold; color: #10b981; margin: 1rem 0; }
+        .no-match { color: #ef4444; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div id="screen-1">
+        <h1>Player 1</h1>
+        <p>Enter 3 things you're willing to eat tonight.</p>
+        <input type="text" id="p1-1" placeholder="e.g., Pizza">
+        <input type="text" id="p1-2" placeholder="e.g., Sushi">
+        <input type="text" id="p1-3" placeholder="e.g., Tacos">
+        <button onclick="nextPlayer()">Lock It In</button>
+    </div>
+
+    <div id="screen-2" class="hidden">
+        <h1>Player 2</h1>
+        <p>No peeking! Enter 3 things you're willing to eat.</p>
+        <input type="text" id="p2-1" placeholder="e.g., Burgers">
+        <input type="text" id="p2-2" placeholder="e.g., Tacos">
+        <input type="text" id="p2-3" placeholder="e.g., Thai">
+        <button onclick="calculateMatch()">Reveal Dinner</button>
+    </div>
+
+    <div id="screen-3" class="hidden">
+        <h1>The Verdict</h1>
+        <div id="result-text"></div>
+        <button onclick="location.reload()">Try Again</button>
+    </div>
+</div>
+
+<script>
+    let player1Choices = [];
+
+    function nextPlayer() {
+        // Grab Player 1's inputs, convert to lowercase, and trim extra spaces
+        const i1 = document.getElementById('p1-1').value.toLowerCase().trim();
+        const i2 = document.getElementById('p1-2').value.toLowerCase().trim();
+        const i3 = document.getElementById('p1-3').value.toLowerCase().trim();
+
+        if (!i1 || !i2 || !i3) {
+            alert("Please fill out all 3 options!");
+            return;
+        }
+
+        player1Choices = [i1, i2, i3];
+
+        // Hide screen 1, show screen 2
+        document.getElementById('screen-1').classList.add('hidden');
+        document.getElementById('screen-2').classList.remove('hidden');
+    }
+
+    function calculateMatch() {
+        // Grab Player 2's inputs
+        const i1 = document.getElementById('p2-1').value.toLowerCase().trim();
+        const i2 = document.getElementById('p2-2').value.toLowerCase().trim();
+        const i3 = document.getElementById('p2-3').value.toLowerCase().trim();
+
+        if (!i1 || !i2 || !i3) {
+            alert("Please fill out all 3 options!");
+            return;
+        }
+
+        const player2Choices = [i1, i2, i3];
+        
+        // Find the intersection (matches) between the two arrays
+        const matches = player1Choices.filter(food => player2Choices.includes(food));
+
+        // Hide screen 2, show screen 3
+        document.getElementById('screen-2').classList.add('hidden');
+        document.getElementById('screen-3').classList.remove('hidden');
+
+        const resultDiv = document.getElementById('result-text');
+
+        if (matches.length > 0) {
+            // Capitalize the first letter for a nicer display
+            const winningFood = matches[0].charAt(0).toUpperCase() + matches[0].slice(1);
+            resultDiv.innerHTML = `<p>We have a match!</p><div class="match-result">🎉 ${winningFood} 🎉</div>`;
+        } else {
+            resultDiv.innerHTML = `<p>Stalemate.</p><div class="match-result no-match">No matches found. Time to flip a coin!</div>`;
+        }
+    }
+</script>
+
+</body>
+</html>
