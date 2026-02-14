@@ -56,81 +56,217 @@
 <body>
 
 <div class="container">
-    <div id="screen-1">
-        <h1>Player 1</h1>
-        <p>Enter 3 things you're willing to eat tonight.</p>
-        <input type="text" id="p1-1" placeholder="e.g., Pizza">
-        <input type="text" id="p1-2" placeholder="e.g., Sushi">
-        <input type="text" id="p1-3" placeholder="e.g., Tacos">
-        <button onclick="nextPlayer()">Lock It In</button>
+    <div class="row">
+        <div class="col card" id="screen-1">
+            <h1>Player 1</h1>
+            <p>Enter 3 things you're willing to eat tonight. Autocomplete powered by TheMealDB.</p>
+            <div class="suggestions">
+                <label for="p1-1">Option 1</label>
+                <input type="text" id="p1-1" placeholder="e.g., Pizza">
+                <div class="suggestions-list hidden" id="s-p1-1"></div>
+            </div>
+            <div class="suggestions">
+                <label for="p1-2">Option 2</label>
+                <input type="text" id="p1-2" placeholder="e.g., Sushi">
+                <div class="suggestions-list hidden" id="s-p1-2"></div>
+            </div>
+            <div class="suggestions">
+                <label for="p1-3">Option 3</label>
+                <input type="text" id="p1-3" placeholder="e.g., Tacos">
+                <div class="suggestions-list hidden" id="s-p1-3"></div>
+            </div>
+            <div class="controls">
+                <button id="lock-btn" onclick="nextPlayer()">Lock It In</button>
+                <button class="secondary" onclick="fillExample(1)">Example</button>
+            </div>
+        </div>
+
+        <div class="col card hidden" id="screen-2">
+            <h1>Player 2</h1>
+            <p>No peeking! Enter 3 things you're willing to eat.</p>
+            <div class="suggestions">
+                <label for="p2-1">Option 1</label>
+                <input type="text" id="p2-1" placeholder="e.g., Burgers">
+                <div class="suggestions-list hidden" id="s-p2-1"></div>
+            </div>
+            <div class="suggestions">
+                <label for="p2-2">Option 2</label>
+                <input type="text" id="p2-2" placeholder="e.g., Tacos">
+                <div class="suggestions-list hidden" id="s-p2-2"></div>
+            </div>
+            <div class="suggestions">
+                <label for="p2-3">Option 3</label>
+                <input type="text" id="p2-3" placeholder="e.g., Thai">
+                <div class="suggestions-list hidden" id="s-p2-3"></div>
+            </div>
+            <div class="controls">
+                <button onclick="calculateMatch()">Reveal Dinner</button>
+                <button class="secondary" onclick="fillExample(2)">Example</button>
+            </div>
+        </div>
     </div>
 
-    <div id="screen-2" class="hidden">
-        <h1>Player 2</h1>
-        <p>No peeking! Enter 3 things you're willing to eat.</p>
-        <input type="text" id="p2-1" placeholder="e.g., Burgers">
-        <input type="text" id="p2-2" placeholder="e.g., Tacos">
-        <input type="text" id="p2-3" placeholder="e.g., Thai">
-        <button onclick="calculateMatch()">Reveal Dinner</button>
-    </div>
-
-    <div id="screen-3" class="hidden">
+    <div id="screen-3" class="card hidden" style="margin-top:1rem">
         <h1>The Verdict</h1>
         <div id="result-text"></div>
-        <button onclick="location.reload()">Try Again</button>
+        <div class="result-list" id="result-list"></div>
+        <footer>
+            <div></div>
+            <div>
+                <button onclick="location.reload()">Try Again</button>
+            </div>
+        </footer>
     </div>
 </div>
 
 <script>
+    // -- Basic state
     let player1Choices = [];
 
-    function nextPlayer() {
-        // Grab Player 1's inputs, convert to lowercase, and trim extra spaces
-        const i1 = document.getElementById('p1-1').value.toLowerCase().trim();
-        const i2 = document.getElementById('p1-2').value.toLowerCase().trim();
-        const i3 = document.getElementById('p1-3').value.toLowerCase().trim();
+    // -- Helpers
+    function normalize(s){
+        return (s||'').toLowerCase().replace(/[\W_]+/g,' ').replace(/\s+/g,' ').trim();
+    }
 
-        if (!i1 || !i2 || !i3) {
-            alert("Please fill out all 3 options!");
-            return;
+    function tokens(s){ return normalize(s).split(' ').filter(Boolean); }
+
+    function tokenOverlap(a,b){
+        const A = new Set(tokens(a));
+        const B = new Set(tokens(b));
+        if(A.size===0||B.size===0) return 0;
+        let intersect=0;
+        A.forEach(x=>{ if(B.has(x)) intersect++; });
+        return intersect / Math.max(A.size, B.size);
+    }
+
+    function levenshtein(a,b){
+        const A = a.split('');
+        const B = b.split('');
+        const m = A.length, n = B.length;
+        const dp = Array.from({length:m+1},(_,i)=>Array(n+1).fill(0));
+        for(let i=0;i<=m;i++) dp[i][0]=i;
+        for(let j=0;j<=n;j++) dp[0][j]=j;
+        for(let i=1;i<=m;i++){
+            for(let j=1;j<=n;j++){
+                dp[i][j] = Math.min(
+                    dp[i-1][j]+1,
+                    dp[i][j-1]+1,
+                    dp[i-1][j-1] + (A[i-1]===B[j-1]?0:1)
+                );
+            }
         }
+        return dp[m][n];
+    }
 
+    function similarity(a,b){
+        const A = normalize(a), B = normalize(b);
+        if(!A || !B) return 0;
+        if(A===B) return 1;
+        if(A.includes(B) || B.includes(A)) return 0.95;
+        const tok = tokenOverlap(A,B);
+        if(tok >= 0.5) return Math.max(0.6, tok);
+        const lev = levenshtein(A,B);
+        const maxLen = Math.max(A.length, B.length);
+        const levScore = 1 - (lev / Math.max(1, maxLen));
+        return Math.max(0, Math.min(levScore, tok || levScore));
+    }
+
+    // -- UI helpers for suggestions (TheMealDB)
+    async function fetchSuggestions(query){
+        if(!query || query.length < 2) return [];
+        try{
+            const res = await fetch('https://www.themealdb.com/api/json/v1/1/search.php?s=' + encodeURIComponent(query));
+            const json = await res.json();
+            if(!json || !json.meals) return [];
+            return json.meals.map(m => m.strMeal).filter(Boolean);
+        }catch(e){ return []; }
+    }
+
+    function attachAutocomplete(inputId, listId){
+        const input = document.getElementById(inputId);
+        const list = document.getElementById(listId);
+        let timer = null;
+        input.addEventListener('input', ()=>{
+            clearTimeout(timer);
+            const q = input.value.trim();
+            if(q.length < 2){ list.classList.add('hidden'); list.innerHTML=''; return; }
+            timer = setTimeout(async ()=>{
+                const items = await fetchSuggestions(q);
+                renderSuggestionList(items, input, list);
+            }, 250);
+        });
+        input.addEventListener('blur', ()=> setTimeout(()=> list.classList.add('hidden'), 150));
+    }
+
+    function renderSuggestionList(items, input, list){
+        if(!items.length){ list.classList.add('hidden'); list.innerHTML=''; return; }
+        list.innerHTML = items.slice(0,8).map(i=>`<div class="suggestion">${i}</div>`).join('');
+        list.querySelectorAll('.suggestion').forEach(el=>{
+            el.addEventListener('click', ()=>{ input.value = el.textContent; list.classList.add('hidden'); });
+        });
+        list.classList.remove('hidden');
+    }
+
+    // Attach autocomplete to all six inputs
+    ['p1-1','p1-2','p1-3','p2-1','p2-2','p2-3'].forEach(id=>{
+        attachAutocomplete(id, 's-' + id);
+    });
+
+    // -- Flow
+    function nextPlayer(){
+        const i1 = document.getElementById('p1-1').value.trim();
+        const i2 = document.getElementById('p1-2').value.trim();
+        const i3 = document.getElementById('p1-3').value.trim();
+        if(!i1 || !i2 || !i3){ alert('Please fill out all 3 options!'); return; }
         player1Choices = [i1, i2, i3];
-
-        // Hide screen 1, show screen 2
         document.getElementById('screen-1').classList.add('hidden');
         document.getElementById('screen-2').classList.remove('hidden');
     }
 
-    function calculateMatch() {
-        // Grab Player 2's inputs
-        const i1 = document.getElementById('p2-1').value.toLowerCase().trim();
-        const i2 = document.getElementById('p2-2').value.toLowerCase().trim();
-        const i3 = document.getElementById('p2-3').value.toLowerCase().trim();
-
-        if (!i1 || !i2 || !i3) {
-            alert("Please fill out all 3 options!");
-            return;
-        }
-
+    function calculateMatch(){
+        const i1 = document.getElementById('p2-1').value.trim();
+        const i2 = document.getElementById('p2-2').value.trim();
+        const i3 = document.getElementById('p2-3').value.trim();
+        if(!i1 || !i2 || !i3){ alert('Please fill out all 3 options!'); return; }
         const player2Choices = [i1, i2, i3];
-        
-        // Find the intersection (matches) between the two arrays
-        const matches = player1Choices.filter(food => player2Choices.includes(food));
 
-        // Hide screen 2, show screen 3
+        // compare every pair and build matches with scores
+        const matches = [];
+        player1Choices.forEach(a=>{
+            player2Choices.forEach(b=>{
+                const score = similarity(a,b);
+                if(score >= 0.6) matches.push({a,b,score});
+            });
+        });
+
+        // Show results
         document.getElementById('screen-2').classList.add('hidden');
-        document.getElementById('screen-3').classList.remove('hidden');
+        const r3 = document.getElementById('screen-3');
+        r3.classList.remove('hidden');
+        const resultText = document.getElementById('result-text');
+        const resultList = document.getElementById('result-list');
+        resultList.innerHTML='';
 
-        const resultDiv = document.getElementById('result-text');
-
-        if (matches.length > 0) {
-            // Capitalize the first letter for a nicer display
-            const winningFood = matches[0].charAt(0).toUpperCase() + matches[0].slice(1);
-            resultDiv.innerHTML = `<p>We have a match!</p><div class="match-result">🎉 ${winningFood} 🎉</div>`;
+        if(matches.length){
+            resultText.innerHTML = `<p>We found similar options between players:</p>`;
+            // sort by score desc
+            matches.sort((x,y)=>y.score-x.score);
+            matches.forEach(m=>{
+                const scorePct = Math.round(m.score*100);
+                const el = document.createElement('div');
+                el.className = 'chip';
+                el.textContent = `${m.a} ↔ ${m.b} (${scorePct}%)`;
+                resultList.appendChild(el);
+            });
         } else {
-            resultDiv.innerHTML = `<p>Stalemate.</p><div class="match-result no-match">No matches found. Time to flip a coin!</div>`;
+            resultText.innerHTML = `<p class="no-match">No close matches found. Try broader terms (e.g., "rice" instead of "fried rice with egg").</p>`;
         }
+    }
+
+    // small helper to demonstrate UI
+    function fillExample(player){
+        if(player===1){ document.getElementById('p1-1').value='Rice'; document.getElementById('p1-2').value='Pizza'; document.getElementById('p1-3').value='Tacos'; }
+        else { document.getElementById('p2-1').value='Rice and curry sauce'; document.getElementById('p2-2').value='Burger'; document.getElementById('p2-3').value='Sushi'; }
     }
 </script>
 
