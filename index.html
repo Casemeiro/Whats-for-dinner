@@ -1,51 +1,31 @@
-<!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Whats for Dinner</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            transition: background-color 0.5s;
-        }
-        .fade-in {
-            animation: fadeIn 1s;
-        }
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-        .slide-in {
-            animation: slideIn 1s;
-        }
-        @keyframes slideIn {
-            from { transform: translateX(-100%); opacity: 0; }
-            to { transform: translateX(0); opacity: 1; }
-        }
-        button {
-            background-color: #4CAF50;
-            color: white;
-            border: none;
-            padding: 15px 32px;
-            text-align: center;
-            text-decoration: none;
-            display: inline-block;
-            font-size: 16px;
-            margin: 4px 2px;
-            cursor: pointer;
-            transition: background-color 0.3s;
-        }
-        button:hover {
-            background-color: #45a049;
-        }
-    </style>
+    <title>Food Detection</title>
 </head>
 <body>
-    <div class="fade-in">
-        <h1>Whats for Dinner</h1>
-        <p>Discover delicious ideas for your next meal!</p>
-        <button class="slide-in">Get Recipe</button>
-    </div>
+    <h1>Welcome to What's for Dinner!</h1>
+    <script>
+        function detectFood(input) {
+            const foods = ['apple', 'banana', 'carrot'];
+            return foods.filter(food => food.toLowerCase() === input.toLowerCase());
+        }
+
+        // Example usage
+        console.log(detectFood('Apple')); // ['apple']
+    </script>
+    <script>
+        // Preferences API
+        const preferences = {
+            vegetarian: true,
+            spicy: false
+        };
+
+        function getPreferences() {
+            return preferences;
+        }
+
+        // Example usage
+        console.log(getPreferences()); // { vegetarian: true, spicy: false }
+    </script>
 </body>
 </html>
