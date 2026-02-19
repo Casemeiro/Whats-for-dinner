@@ -3,328 +3,49 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Advanced Meal Planner</title>
+    <title>Whats for Dinner</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            padding: 20px;
+            font-family: Arial, sans-serif;
+            transition: background-color 0.5s;
         }
-        .container {
-            max-width: 900px;
-            margin: 0 auto;
-            background: white;
-            border-radius: 10px;
-            padding: 30px;
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+        .fade-in {
+            animation: fadeIn 1s;
         }
-        h1 {
-            color: #333;
-            margin-bottom: 30px;
-            text-align: center;
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
         }
-        .section {
-            margin-bottom: 30px;
-            padding: 20px;
-            background: #f8f9fa;
-            border-radius: 8px;
-            border-left: 4px solid #667eea;
+        .slide-in {
+            animation: slideIn 1s;
         }
-        .section h2 {
-            color: #667eea;
-            margin-bottom: 15px;
-            font-size: 1.5em;
-        }
-        .form-group {
-            margin-bottom: 15px;
-            display: flex;
-            gap: 10px;
-            flex-wrap: wrap;
-            align-items: center;
-        }
-        label {
-            font-weight: 600;
-            color: #555;
-            min-width: 120px;
-        }
-        input, select {
-            padding: 10px 15px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            font-size: 1em;
-            flex: 1;
-            min-width: 150px;
+        @keyframes slideIn {
+            from { transform: translateX(-100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
         }
         button {
-            padding: 10px 25px;
-            background: #667eea;
+            background-color: #4CAF50;
             color: white;
             border: none;
-            border-radius: 5px;
+            padding: 15px 32px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            margin: 4px 2px;
             cursor: pointer;
-            font-weight: 600;
-            transition: background 0.3s;
+            transition: background-color 0.3s;
         }
         button:hover {
-            background: #764ba2;
-        }
-        .output-box {
-            background: white;
-            padding: 15px;
-            border-radius: 5px;
-            margin-top: 15px;
-            border: 1px solid #ddd;
-        }
-        .output-box p {
-            color: #333;
-            line-height: 1.6;
-        }
-        .success {
-            color: #28a745;
-        }
-        .info {
-            color: #667eea;
-        }
-        .logged {
-            color: #17a2b8;
-        }
-        .suggestion {
-            color: #fd7e14;
-            font-weight: 600;
-        }
-        .preferences-list, .history-list {
-            background: white;
-            padding: 15px;
-            border-radius: 5px;
-            margin-top: 10px;
-        }
-        .pref-item, .history-item {
-            padding: 8px;
-            background: #e9ecef;
-            margin-bottom: 8px;
-            border-radius: 4px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        .delete-btn {
-            padding: 5px 10px;
-            background: #dc3545;
-            font-size: 0.85em;
-        }
-        .delete-btn:hover {
-            background: #c82333;
+            background-color: #45a049;
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>🍽️ Advanced Meal Planner</h1>
-
-        <!-- Rank Food Section -->
-        <div class="section">
-            <h2>⭐ Set Food Preferences</h2>
-            <div class="form-group">
-                <input type="text" id="foodInput" placeholder="Enter food item (e.g., Rice and Beans)">
-                <input type="number" id="rankInput" placeholder="Rank (1-10)" min="1" max="10">
-                <button onclick="rankFood()">Add Food</button>
-            </div>
-            <div id="preferencesOutput"></div>
-        </div>
-
-        <!-- Log Meal Section -->
-        <div class="section">
-            <h2>📝 Log Your Meal</h2>
-            <div class="form-group">
-                <select id="periodInput">
-                    <option value="">Select Period</option>
-                    <option value="morning">Morning</option>
-                    <option value="afternoon">Afternoon</option>
-                    <option value="evening">Evening</option>
-                    <option value="night">Night</option>
-                </select>
-                <input type="text" id="mealInput" placeholder="What did you eat?">
-                <button onclick="logMeal()">Log Meal</button>
-            </div>
-            <div id="mealsOutput"></div>
-        </div>
-
-        <!-- Get Suggestion Section -->
-        <div class="section">
-            <h2>💡 Get Meal Suggestion</h2>
-            <button onclick="getSuggestion()">Get Suggestion</button>
-            <div id="suggestionOutput"></div>
-        </div>
-
-        <!-- AI Prompt Section -->
-        <div class="section">
-            <h2>🤖 AI Integration</h2>
-            <button onclick="generateAIPrompt()">Generate AI Prompt</button>
-            <div id="aiOutput"></div>
-        </div>
+    <div class="fade-in">
+        <h1>Whats for Dinner</h1>
+        <p>Discover delicious ideas for your next meal!</p>
+        <button class="slide-in">Get Recipe</button>
     </div>
-
-    <script>
-        // Initialize data structure
-        const app = {
-            users: {},
-            currentUser: "user_123"
-        };
-
-        function ensureUserExists(userId) {
-            if (!app.users[userId]) {
-                app.users[userId] = { rankings: {}, history: [] };
-            }
-        }
-
-        function rankFood() {
-            const foodInput = document.getElementById("foodInput");
-            const rankInput = document.getElementById("rankInput");
-            const food = foodInput.value.trim();
-            const rank = parseInt(rankInput.value);
-
-            if (!food || !rank || rank < 1 || rank > 10) {
-                alert("Please enter a valid food and rank (1-10)");
-                return;
-            }
-
-            ensureUserExists(app.currentUser);
-            app.users[app.currentUser].rankings[food] = rank;
-            
-            displayOutput("preferencesOutput", `<p class="success">✓ '${food}' ranked as ${rank}/10</p>`);
-            displayPreferences();
-            foodInput.value = "";
-            rankInput.value = "";
-        }
-
-        function displayPreferences() {
-            ensureUserExists(app.currentUser);
-            const rankings = app.users[app.currentUser].rankings;
-            let html = '<div class="preferences-list"><strong>Your Preferences:</strong>';
-            
-            if (Object.keys(rankings).length === 0) {
-                html += '<p>No preferences added yet</p>';
-            } else {
-                for (const [food, rank] of Object.entries(rankings)) {
-                    html += `<div class="pref-item"><span>${food} - ${rank}/10</span><button class="delete-btn" onclick="deleteFood('${food}')">Delete</button></div>`;
-                }
-            }
-            html += '</div>';
-            document.getElementById("preferencesOutput").innerHTML += html;
-        }
-
-        function deleteFood(food) {
-            delete app.users[app.currentUser].rankings[food];
-            document.getElementById("preferencesOutput").innerHTML = "";
-            displayPreferences();
-        }
-
-        function logMeal() {
-            const period = document.getElementById("periodInput").value;
-            const meal = document.getElementById("mealInput").value.trim();
-
-            if (!period || !meal) {
-                alert("Please select a period and enter a meal");
-                return;
-            }
-
-            ensureUserExists(app.currentUser);
-            const today = new Date().toISOString().split('T')[0];
-            app.users[app.currentUser].history.push({
-                date: today,
-                period: period,
-                food: meal
-            });
-
-            displayOutput("mealsOutput", `<p class="logged">✓ Logged: ${meal} (${period})</p>`);
-            displayMealHistory();
-            document.getElementById("periodInput").value = "";
-            document.getElementById("mealInput").value = "";
-        }
-
-        function displayMealHistory() {
-            ensureUserExists(app.currentUser);
-            const history = app.users[app.currentUser].history;
-            let html = '<div class="history-list"><strong>Meal History:</strong>';
-            
-            if (history.length === 0) {
-                html += '<p>No meals logged yet</p>';
-            } else {
-                for (let i = history.length - 1; i >= Math.max(0, history.length - 5); i--) {
-                    const meal = history[i];
-                    html += `<div class="history-item"><span>${meal.period}: ${meal.food}</span></div>`;
-                }
-            }
-            html += '</div>';
-            document.getElementById("mealsOutput").innerHTML += html;
-        }
-
-        function getSuggestion() {
-            ensureUserExists(app.currentUser);
-            const userData = app.users[app.currentUser];
-
-            if (Object.keys(userData.rankings).length === 0) {
-                displayOutput("suggestionOutput", "<p class='info'>ℹ️ Please rank some foods first!</p>");
-                return;
-            }
-
-            const today = new Date().toISOString().split('T')[0];
-            const eatenToday = userData.history
-                .filter(m => m.date === today)
-                .map(m => m.food);
-
-            const rankedFoods = Object.entries(userData.rankings)
-                .sort((a, b) => b[1] - a[1]);
-
-            for (const [food, rank] of rankedFoods) {
-                if (!eatenToday.includes(food)) {
-                    displayOutput("suggestionOutput", `<p class="suggestion">💡 Suggestion: How about <strong>${food}</strong>? It's highly ranked (${rank}/10) and you haven't had it today.</p>`);
-                    return;
-                }
-            }
-
-            displayOutput("suggestionOutput", "<p class='suggestion'>💡 You've already eaten all your top-ranked foods today! Time to explore something new.</p>");
-        }
-
-        function generateAIPrompt() {
-            ensureUserExists(app.currentUser);
-            const userData = app.users[app.currentUser];
-
-            if (Object.keys(userData.rankings).length === 0) {
-                displayOutput("aiOutput", "<p>ℹ️ No data found. Add preferences and meals first.</p>");
-                return;
-            }
-
-            const history = userData.history
-                .slice(-5)
-                .map(m => `${m.period}: ${m.food}`)
-                .join(", ");
-
-            const preferences = Object.entries(userData.rankings)
-                .map(([f, r]) => `${f} (${r}/10)`)
-                .join(", ");
-
-            const prompt = `You are a nutritionist AI helping a user overcome decision fatigue. Here are their top-rated foods: ${preferences}. Here are their last few meals: ${history}. Suggest a healthy, comforting meal for their next meal that breaks the routine but fits their tastes.`;
-
-            displayOutput("aiOutput", `<div class="output-box"><p><strong>AI Prompt Ready:</strong></p><p>${prompt}</p></div>`);
-        }
-
-        function displayOutput(elementId, html) {
-            document.getElementById(elementId).innerHTML = html;
-        }
-
-        // Initialize on load
-        window.addEventListener("load", function() {
-            ensureUserExists(app.currentUser);
-            displayPreferences();
-            displayMealHistory();
-        });
-    </script>
 </body>
 </html>
