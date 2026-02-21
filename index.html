@@ -324,6 +324,7 @@
   <button class="filter-btn" onclick="toggleFilter(this,'mediterranean')">🫒 Mediterranean</button>
   <button class="filter-btn" onclick="toggleFilter(this,'comfort')">🛋️ Comfort</button>
   <button class="filter-btn" onclick="toggleFilter(this,'healthy')">🥦 Healthy</button>
+  <button class="filter-btn" onclick="toggleFilter(this,'nigerian')">🇳🇬 Nigerian</button>
 </div>
 
 <div class="result-area" id="resultArea">
@@ -388,6 +389,20 @@ const FOODS = [
   { name: "Chicken Pot Pie", emoji: "🥧", desc: "Flaky pastry filled with creamy chicken stew", tags: ["Comfort","Hearty"], category:"comfort", mood:["hearty","any"] },
   { name: "Fish & Chips", emoji: "🐟", desc: "Beer-battered cod with thick-cut chips", tags: ["Comfort","British"], category:"comfort", mood:["hearty","any"] },
   { name: "Pancakes", emoji: "🥞", desc: "Fluffy stack drizzled in maple syrup", tags: ["Comfort","Breakfast"], category:"comfort", mood:["light","snack","any"] },
+
+  // Nigerian
+  { name: "Jollof Rice", emoji: "🍚", desc: "Smoky, spiced tomato rice — the crown jewel of West African cooking", tags: ["Nigerian","Hearty"], category:"nigerian", mood:["hearty","feast","any"] },
+  { name: "Egusi Soup", emoji: "🫕", desc: "Ground melon seed soup with leafy greens & assorted meats", tags: ["Nigerian","Hearty"], category:"nigerian", mood:["hearty","feast","any"] },
+  { name: "Suya", emoji: "🍢", desc: "Spiced grilled beef skewers with yaji pepper mix", tags: ["Nigerian","Snack"], category:"nigerian", mood:["snack","light","any"] },
+  { name: "Pounded Yam & Egusi", emoji: "🫙", desc: "Smooth, stretchy yam fufu paired with rich egusi soup", tags: ["Nigerian","Hearty"], category:"nigerian", mood:["hearty","feast","any"] },
+  { name: "Moi Moi", emoji: "🟤", desc: "Steamed bean pudding with peppers, onions & eggs", tags: ["Nigerian","Light"], category:"nigerian", mood:["light","snack","any"] },
+  { name: "Fried Plantain (Dodo)", emoji: "🍌", desc: "Sweet, golden caramelised plantain slices — sides don't get better", tags: ["Nigerian","Snack"], category:"nigerian", mood:["snack","any"] },
+  { name: "Okra Soup", emoji: "🥬", desc: "Silky, hearty okra stew with assorted fish & meat", tags: ["Nigerian","Hearty"], category:"nigerian", mood:["hearty","any"] },
+  { name: "Akara", emoji: "🟡", desc: "Crispy deep-fried bean cakes, perfect for breakfast", tags: ["Nigerian","Snack"], category:"nigerian", mood:["snack","light","any"] },
+  { name: "Pepper Soup", emoji: "🍲", desc: "Fiery, aromatic spiced broth with goat meat or fish", tags: ["Nigerian","Light"], category:"nigerian", mood:["light","any"] },
+  { name: "Ofada Rice & Ayamase", emoji: "🍛", desc: "Local unpolished rice with rich, smoky green pepper stew", tags: ["Nigerian","Hearty"], category:"nigerian", mood:["hearty","feast","any"] },
+  { name: "Banga Soup", emoji: "🫕", desc: "Palm fruit soup fragrant with spices & dried fish, served with starch", tags: ["Nigerian","Hearty"], category:"nigerian", mood:["hearty","feast","any"] },
+  { name: "Puff Puff", emoji: "🍩", desc: "Soft, fluffy deep-fried dough balls — Nigeria's favourite street snack", tags: ["Nigerian","Snack"], category:"nigerian", mood:["snack","any"] },
 
   // Healthy
   { name: "Grain Bowl", emoji: "🥙", desc: "Quinoa, roasted veggies & tahini drizzle", tags: ["Healthy","Light"], category:"healthy", mood:["light","any"] },
